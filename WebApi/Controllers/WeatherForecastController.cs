@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain;
-using Infra;
+using Domain.ApiConnection.Consumers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.Users
@@ -15,9 +14,9 @@ namespace WebApi.Controllers.Users
         public IActionResult Get()
         {
             // var teste2 = new Repository();
-            var teste2 = new Teste().testeAsync();
-            System.Console.WriteLine(teste2.Result);
-            return Ok();
+            var teste2 = new Consumer().FilterData();
+            // System.Console.WriteLine(teste2);
+            return Ok(teste2);
         }
     }
 }
