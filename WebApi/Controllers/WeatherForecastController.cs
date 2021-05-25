@@ -15,8 +15,8 @@ namespace WebApi.Controllers.Users
         public IActionResult Get()
         {
             // var teste2 = new Repository();
-            var teste2 = new Teste();
-            System.Console.WriteLine(teste2.testeAsync().Result);
+            var teste2 = new Teste().testeAsync();
+            System.Console.WriteLine(teste2.Result);
             return Ok();
         }
     }

@@ -1,11 +1,12 @@
 using System;
 using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace Domain
 {
     public class Teste
     {
-        public async System.Threading.Tasks.Task<string> testeAsync()
+        public System.Threading.Tasks.Task<string> testeAsync()
         {
             var client = new HttpClient();
             var request = new HttpRequestMessage
@@ -18,13 +19,16 @@ namespace Domain
                     { "x-rapidapi-host", "covid-19-tracking.p.rapidapi.com" },
                 },
             };
-            
-            using (var response = await client.SendAsync(request))
-            {
-                response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
-                return body;
-            }
+
+            var response = client.SendAsync(request).Result;
+            var teste = response.Content.ReadAsStringAsync();
+            return teste;
+            // using (var response = await client.SendAsync(request))
+            // {
+            //     response.EnsureSuccessStatusCode();
+            //     var body = await response.Content.ReadAsStringAsync();
+            //     return body;
+            // }
         }
     }
 }
