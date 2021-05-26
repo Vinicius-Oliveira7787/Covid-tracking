@@ -2,8 +2,15 @@ using System;
 
 namespace Domain.Countries
 {
-    public class CountriesService
+    public class CountriesService : ICountriesService
     {
+        private static ICountriesRepository _repository { get; set; }
+
+        public CountriesService(ICountriesRepository repository)
+        {
+            _repository = repository;
+        }
+
         public CreatedCountryDTO Create(
             string activeCases,
             string countryName,
@@ -16,7 +23,8 @@ namespace Domain.Countries
         )
         {
             var country = new Country(activeCases, countryName, lastUpdate, newCases, newDeaths, totalCases, totalDeaths, totalRecovered);
-            return new CreatedCountryDTO(Guid.NewGuid());
+            _repository.SaveEntity(country);
+            return new CreatedCountryDTO(country.Id);
         }
     }
 }

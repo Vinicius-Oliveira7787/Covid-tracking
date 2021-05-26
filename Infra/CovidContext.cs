@@ -7,9 +7,6 @@ namespace Infra
 {
     public class CovidContext : DbContext
     {
-        public DbSet<Book> Book { get; set; }
-
-        public DbSet<Publish> Publisher { get; set; }
         public DbSet<Country> Countries { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

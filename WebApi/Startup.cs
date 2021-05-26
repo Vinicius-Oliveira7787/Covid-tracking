@@ -33,6 +33,7 @@ namespace WebApi
         {
             services.AddScoped(typeof (IRepository<>), typeof (Repository<>));
             services.AddScoped<ICountriesRepository, CountriesRepository>();
+            services.AddScoped<ICountriesService, CountriesService>();
             services.AddDbContext<CovidContext>();
 
             services.AddControllers();
@@ -45,10 +46,10 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            using (var database = new CovidContext())
-            {
-                database.Database.Migrate();
-            }
+            // using (var database = new CovidContext())
+            // {
+            //     database.Database.Migrate();
+            // }
 
             if (env.IsDevelopment())
             {
