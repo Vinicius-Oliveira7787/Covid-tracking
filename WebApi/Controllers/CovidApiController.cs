@@ -23,17 +23,17 @@ namespace WebApi.Controllers.CovidApi
         {
             // var teste2 = new Repository();
             // var teste2 = new Consumer().FilterDataToPutInDb();
-            var teste2 = new Consumer().HandleDataToPutInDb();
+            var teste2 = new Consumer().GetAllContries();
+            var data = _countriesService.GetCountry("USA");
             // System.Console.WriteLine(teste2);
-            return Ok(teste2[0]);
+            return Ok(data);
         }
 
         [HttpPost]
         public IActionResult GetCountryById(GetCountryByNameUsingTheApiRequest request)
         {
             var consumer = new Consumer();
-            var data = consumer.GetSingleCountry(request.CountryName);
-            // var teste = _countriesService.Create();
+            var data = _countriesService.Create(request.CountryName);
             return Ok(data);
         }
     }

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Domain.ApiConnection.Consumers
 {
-    public class Consumer
+    public class Consumer : IConsumer
     {
         public static string BaseUrl 
         {
@@ -42,14 +42,29 @@ namespace Domain.ApiConnection.Consumers
             return SendRequestAndGetResponseToTheCovidApi(string.Empty);
         }
 
-        public string GetSingleCountry(string countryName)
+        public Country GetSingleCountryByName(string countryName)
         {
             var response = SendRequestAndGetResponseToTheCovidApi(countryName);
             var covidData = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-            return covidData.ToString();
+            
+            return TurnJTokenToObjectCountry(covidData);
+        }
+
+        private Country TurnJTokenToObjectCountry(JToken data)
+        {
+            var activeCases = data["Active Cases_text"].ToString();
+            var countryName = data["Country_text"].ToString().ToString();
+            var lastUpdate = data["Last Update"].ToString();
+            var newCases = data["New Cases_text"].ToString();
+            var newDeaths = data["New Deaths_text"].ToString();
+            var totalCases = data["Total Cases_text"].ToString();
+            var totalDeaths = data["Total Deaths_text"].ToString();
+            var totalRecovered = data["Total Recovered_text"].ToString();
+
+            return new Country(activeCases, countryName, lastUpdate, newCases, newDeaths, totalCases, totalDeaths, totalRecovered);
         }
         
-        public IList<Country> HandleDataToPutInDb()
+        public IList<Country> GetAllContries()
         {
             var countries = new List<Country>();
             
@@ -60,16 +75,7 @@ namespace Domain.ApiConnection.Consumers
             {
                 try
                 {
-                    var activeCases = currentCountry["Active Cases_text"].ToString();
-                    var countryName = currentCountry["Country_text"].ToString().ToString();
-                    var lastUpdate = currentCountry["Last Update"].ToString();
-                    var newCases = currentCountry["New Cases_text"].ToString();
-                    var newDeaths = currentCountry["New Deaths_text"].ToString();
-                    var totalCases = currentCountry["Total Cases_text"].ToString();
-                    var totalDeaths = currentCountry["Total Deaths_text"].ToString();
-                    var totalRecovered = currentCountry["Total Recovered_text"].ToString();
-
-                    var country = new Country(activeCases, countryName, lastUpdate, newCases, newDeaths, totalCases, totalDeaths, totalRecovered);
+                    var country = TurnJTokenToObjectCountry(currentCountry);
                     countries.Add(country);
                 }
 

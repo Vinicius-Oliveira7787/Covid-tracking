@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using Domain;
 using Domain.Common;
@@ -22,25 +24,20 @@ namespace Infra
             covidContext.SaveChanges();
         }
 
-        // public string PrintData()
-        // {
-        //     InsertData();
-
-        //     // Gets and prints all books in database
-        //     using (var context = new CovidContext())
-        //     {
-        //         var books = context.Book.Include(p => p.Publisher);
-                
-        //         var data = new StringBuilder();
-        //         foreach(var book in books)
-        //         {
-        //             data.AppendLine($"ISBN: {book.ISBN}");
-        //             data.AppendLine($"Title: {book.Title}");
-        //             data.AppendLine($"Publisher: {book.Publisher.Name}");
-        //         }
-
-        //         return data.ToString();
-        //     }
-        // }
+        // TODO: Fazer get genérico funcionar
+        public T Get(Expression<Func<T, bool>> predicate)
+        {
+            return covidContext
+                .Set<T>()
+                .Include(x => x.Id)
+                .Where(predicate)
+                .FirstOrDefault();
+        }
+        
+        public T Get(Guid id)
+        {
+            return Get(x => x.Id == id);
+            // return covidContext.Set<T>().Find(id); // Funcionando
+        }
     }
 }
