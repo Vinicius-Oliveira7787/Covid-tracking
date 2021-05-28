@@ -1,6 +1,6 @@
 namespace WebApi.Controllers.CovidApi
 {
-    public class GetCountryByNameUsingTheApiRequest
+    public class CountryNameRequest
     {
         public string CountryName { get; set; }
     }

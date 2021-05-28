@@ -11,6 +11,7 @@ namespace Infra.Mappings
             builder.HasKey(country => country.Id);
             builder.Property(country => country.ActiveCases).IsRequired();
             builder.Property(country => country.CountryName).IsRequired();
+            builder.HasIndex(country => country.CountryName).IsUnique();
             builder.Property(country => country.LastUpdate).IsRequired();
             builder.Property(country => country.NewCases).IsRequired();
             builder.Property(country => country.NewDeaths).IsRequired();

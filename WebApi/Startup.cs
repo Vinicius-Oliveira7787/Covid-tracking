@@ -51,7 +51,7 @@ namespace WebApi
             using (var database = new CovidContext())
             {
                 database.Database.EnsureCreated();
-                database.Database.Migrate();
+                // database.Database.Migrate();
             }
 
             if (env.IsDevelopment())

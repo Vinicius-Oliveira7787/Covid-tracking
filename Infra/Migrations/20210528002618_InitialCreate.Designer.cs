@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infra.Migrations
 {
     [DbContext(typeof(CovidContext))]
-    [Migration("20210526203429_InitialCreate")]
+    [Migration("20210528002618_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,19 +25,15 @@ namespace Infra.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("varbinary(16)");
 
-                    b.Property<string>("ActiveCases")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<double>("ActiveCases")
+                        .HasColumnType("double");
 
                     b.Property<string>("CountryName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(767)");
 
                     b.Property<string>("LastUpdate")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
                         .HasColumnType("text");
 
                     b.Property<string>("NewCases")
@@ -61,6 +57,9 @@ namespace Infra.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CountryName")
+                        .IsUnique();
 
                     b.ToTable("Countries");
                 });

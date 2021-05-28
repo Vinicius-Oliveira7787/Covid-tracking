@@ -1,11 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using Domain;
 using Domain.Common;
 using Domain.Countries;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infra
 {
@@ -18,26 +15,40 @@ namespace Infra
             this.covidContext = covidContext;
         }
 
-        public void SaveEntity(T entity)
+        public void Add(T entity)
         {
             covidContext.Add<T>(entity);
             covidContext.SaveChanges();
         }
 
-        // TODO: Fazer get genérico funcionar
-        public T Get(Expression<Func<T, bool>> predicate)
+        public void Update(Country countryUpdated)
         {
-            return covidContext
-                .Set<T>()
-                .Include(x => x.Id)
-                .Where(predicate)
-                .FirstOrDefault();
+            var countryOutdated = Get(x => x.CountryName.ToLower() == countryUpdated.CountryName.ToLower());
+            if (countryOutdated != null)
+            {
+                countryUpdated.Id = countryOutdated.Id;
+                Delete(countryOutdated.CountryName);
+                covidContext.Add(countryUpdated);
+                covidContext.SaveChanges();
+            }
         }
-        
-        public T Get(Guid id)
+
+        public void Delete(string countryName)
         {
-            return Get(x => x.Id == id);
-            // return covidContext.Set<T>().Find(id); // Funcionando
+            var country = Get(x => x.CountryName.ToLower() == countryName.ToLower());
+            covidContext.Remove(country);
+            covidContext.SaveChanges();
+        }
+
+        public IList<Country> GetAll()
+        {
+            return covidContext.Countries.ToList();
+        }
+
+        public Country Get(Func<Country, bool> predicate)
+        {
+            // return covidContext.Set<T>().FirstOrDefault(predicate); //! Não está funcionando 😥
+            return covidContext.Countries.FirstOrDefault(predicate);
         }
     }
 }

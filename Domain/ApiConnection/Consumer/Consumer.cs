@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using Domain.ApiConnection.Instance;
 using Domain.Countries;
@@ -18,7 +17,7 @@ namespace Domain.ApiConnection.Consumers
             }
         }
 
-        private HttpResponseMessage SendRequestAndGetResponseToTheCovidApi(string countryName)
+        private HttpResponseMessage GetResponseFromApi(string countryName = null)
         {
             var request = new HttpRequestMessage
             {
@@ -37,23 +36,18 @@ namespace Domain.ApiConnection.Consumers
             return response;
         }
 
-        private HttpResponseMessage SendRequestAndGetResponseToTheCovidApi()
+        public Country GetByName(string countryName)
         {
-            return SendRequestAndGetResponseToTheCovidApi(string.Empty);
-        }
-
-        public Country GetSingleCountryByName(string countryName)
-        {
-            var response = SendRequestAndGetResponseToTheCovidApi(countryName);
+            var response = GetResponseFromApi(countryName);
             var covidData = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             
-            return TurnJTokenToObjectCountry(covidData);
+            return JTokenToCountry(covidData);
         }
 
-        private Country TurnJTokenToObjectCountry(JToken data)
+        private Country JTokenToCountry(JToken data)
         {
-            var activeCases = data["Active Cases_text"].ToString();
-            var countryName = data["Country_text"].ToString().ToString();
+            var countryName = data["Country_text"].ToString();
+            var activeCases = data["Active Cases_text"].ToObject<double>();
             var lastUpdate = data["Last Update"].ToString();
             var newCases = data["New Cases_text"].ToString();
             var newDeaths = data["New Deaths_text"].ToString();
@@ -61,21 +55,21 @@ namespace Domain.ApiConnection.Consumers
             var totalDeaths = data["Total Deaths_text"].ToString();
             var totalRecovered = data["Total Recovered_text"].ToString();
 
-            return new Country(activeCases, countryName, lastUpdate, newCases, newDeaths, totalCases, totalDeaths, totalRecovered);
+            return new Country(countryName, activeCases, lastUpdate, newCases, newDeaths, totalCases, totalDeaths, totalRecovered);
         }
         
         public IList<Country> GetAllContries()
         {
             var countries = new List<Country>();
             
-            var response = SendRequestAndGetResponseToTheCovidApi();
+            var response = GetResponseFromApi();
             var covidData = JArray.Parse(response.Content.ReadAsStringAsync().Result);
 
             foreach (var currentCountry in covidData)
             {
                 try
                 {
-                    var country = TurnJTokenToObjectCountry(currentCountry);
+                    var country = JTokenToCountry(currentCountry);
                     countries.Add(country);
                 }
 

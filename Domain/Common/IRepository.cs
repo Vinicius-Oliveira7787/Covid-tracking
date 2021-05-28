@@ -1,15 +1,20 @@
 using System;
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using Domain.Countries;
 
 namespace Domain.Common
 {
     public interface IRepository<T> where T : Entity
     {
-        void SaveEntity(T entity);
-                
-        T Get(Expression<Func<T, bool>> predicate);
+        void Add(T entity);
+
+        void Delete(string countryName);
         
-        T Get(Guid id);
+        void Update(Country country);
+        
+        IList<Country> GetAll();
+
+        Country Get(Func<Country, bool> predicate);
+        // T Get(Func<T, bool> predicate);
     }
 }
