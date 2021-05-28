@@ -17,29 +17,39 @@ namespace Domain.ApiConnection.Consumers
             }
         }
 
-        private HttpResponseMessage GetResponseFromApi(string countryName = null)
+        private (HttpResponseMessage message, bool isValid) GetResponseFromApi(string countryName = null)
         {
-            var request = new HttpRequestMessage
+            try
             {
-                Method = HttpMethod.Get,
-                RequestUri = String.IsNullOrEmpty(countryName) 
-                    ? new Uri(BaseUrl)
-                    : new Uri(BaseUrl + $"/{countryName}"),
-                Headers =
+                var request = new HttpRequestMessage
                 {
-                    { "x-rapidapi-key", "f39163a60cmsh5dbbe815ab8b2bbp169ce1jsn363ad8afacf9" },
-                    { "x-rapidapi-host", "covid-19-tracking.p.rapidapi.com" },
-                },
-            };
+                    Method = HttpMethod.Get,
+                    RequestUri = String.IsNullOrEmpty(countryName) 
+                        ? new Uri(BaseUrl)
+                        : new Uri(BaseUrl + $"/{countryName}"),
+                    Headers =
+                    {
+                        { "x-rapidapi-key", "f39163a60cmsh5dbbe815ab8b2bbp169ce1jsn363ad8afacf9" },
+                        { "x-rapidapi-host", "covid-19-tracking.p.rapidapi.com" },
+                    },
+                };
 
-            var response = HttpInstance.GetHttpClientInstance().SendAsync(request).Result;
-            return response;
+                var response = HttpInstance.GetHttpClientInstance().SendAsync(request).Result;
+                return (response, true);
+            }
+
+            catch (System.Exception)
+            {
+                return (null, false);
+            }
         }
 
         public Country GetByName(string countryName)
         {
             var response = GetResponseFromApi(countryName);
-            var covidData = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+            if (!response.isValid) return null;
+
+            var covidData = JObject.Parse(response.message.Content.ReadAsStringAsync().Result);
             
             return JTokenToCountry(covidData);
         }
@@ -63,7 +73,7 @@ namespace Domain.ApiConnection.Consumers
             var countries = new List<Country>();
             
             var response = GetResponseFromApi();
-            var covidData = JArray.Parse(response.Content.ReadAsStringAsync().Result);
+            var covidData = JArray.Parse(response.message.Content.ReadAsStringAsync().Result);
 
             foreach (var currentCountry in covidData)
             {

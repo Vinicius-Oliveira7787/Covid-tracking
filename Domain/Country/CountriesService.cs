@@ -19,7 +19,21 @@ namespace Domain.Countries
         public CreatedCountryDTO Create(string countryName)
         {
             var country = _consumer.GetByName(countryName);
-            _repository.Add(country);
+            if(country == null || country.CountryName != countryName) 
+            {
+                return new CreatedCountryDTO(new List<string>{"Country doesn't exists."});
+            }
+
+            try
+            {
+                _repository.Add(country);
+            }
+            
+            catch (System.Exception)
+            {
+                return new CreatedCountryDTO(new List<string>{"No repeated contries."});
+            }
+
             return new CreatedCountryDTO(country.Id);
         }
 
@@ -47,6 +61,11 @@ namespace Domain.Countries
             try
             {
                 var countryUpdated = _consumer.GetByName(countryName);
+                if(countryUpdated == null || countryUpdated.CountryName != countryName) 
+                {
+                    return false;
+                }
+
                 _repository.Update(countryUpdated);
                 return true;
             }

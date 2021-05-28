@@ -1,4 +1,6 @@
-﻿using Domain.Countries;
+﻿using System;
+using Domain.Authentication;
+using Domain.Countries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.CovidApi
@@ -8,27 +10,32 @@ namespace WebApi.Controllers.CovidApi
     public class CovidApiController : ControllerBase
     {
         private static ICountriesService _countriesService { get; set; }
+        private readonly AuthService _jwtService;
 
-        public CovidApiController(ICountriesService service)
+        public CovidApiController(ICountriesService service, AuthService authenticationService)
         {
             _countriesService = service;
+            _jwtService = authenticationService;
         }
 
         [HttpGet("country")]
         public IActionResult GetSingleCountryByName(CountryNameRequest request)
         {
+            var response = ValidateToken();
+            if (!response.isValid) return response.statusCode;
+            
             var data = _countriesService.GetCountryByName(request.CountryName);
-            if (data != null)
-            {
-                return Ok(data);
-            }
+            if (data != null) return Ok(data);
 
-            return NotFound("Country Not Founded");
+            return NotFound(new { message = "Country Not Founded" });
         }
 
         [HttpGet("countries")]
         public IActionResult GetAllCountries()
         {
+            var response = ValidateToken();
+            if (!response.isValid) return response.statusCode;
+
             var data = _countriesService.GetAll();
             return Ok(data);
         }
@@ -36,6 +43,9 @@ namespace WebApi.Controllers.CovidApi
         [HttpGet("countries/percentage")]
         public IActionResult GetPercentageDiference()
         {
+            var response = ValidateToken();
+            if (!response.isValid) return response.statusCode;
+            
             var data = _countriesService.PercentageDiference();
             return Ok(data);
         }
@@ -43,37 +53,70 @@ namespace WebApi.Controllers.CovidApi
         [HttpDelete]
         public IActionResult Delete(CountryNameRequest request)
         {
+            var response = ValidateToken();
+            if (!response.isValid) return response.statusCode;
+
             var wasDeleted = _countriesService.Delete(request.CountryName);
             if (wasDeleted)
             {
-                return Ok();
+                return Ok(new { message = "success" });
             }
 
-            return NotFound("Country Not Founded");
+            return NotFound(new { message = "Country Not Founded" });
         }
 
         [HttpPut]
         public IActionResult Update(CountryNameRequest request)
         {
+            var response = ValidateToken();
+            if (!response.isValid) return response.statusCode;
+
             var wasUpdated = _countriesService.Update(request.CountryName);
             if (wasUpdated)
             {
-                return Ok();
+                return Ok(new { message = "success"});
             }
 
-            return NotFound("Country Not Founded");
+            return NotFound(new { message = "Country Not Founded"});
         }
 
         [HttpPost]
         public IActionResult Create(CountryNameRequest request)
         {
+            var response = ValidateToken();
+            if (!response.isValid) return response.statusCode;
+
             var data = _countriesService.Create(request.CountryName);
             if (data.IsValid)
             {
-                return Ok();
+                return Created("", new { message = "success"});
             }
 
-            return BadRequest(data.Errors);
+            return BadRequest(new {errors = data.Errors});
+        }
+
+        private (IActionResult statusCode, bool isValid) ValidateToken()
+        {
+            var userId = "";
+            try
+            {
+                var jwt = Request.Cookies["jwt"];
+
+                var token = _jwtService.Verify(jwt);
+                userId = token.Issuer;
+
+                if (userId != "1ccc377c-6090-42d7-a74f-8f3cd49357a2")
+                {
+                    return (Unauthorized(), false);
+                }
+            }
+            
+            catch (Exception)
+            {
+                return (Unauthorized(), false);
+            }
+
+            return (Ok(), true);
         }
     }
 }
