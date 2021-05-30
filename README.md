@@ -88,13 +88,13 @@ Pronto 😊, já pode usufruir da aplicação
 ## 🤔 How to contribute
 
 
-If you want to contribute to this starter, consider:
+Para contribuir considere:
 
-- Reporting bugs and errors
-- Improve the documentation
-- Creating new features and pull requests
+- Reportar bugs e erros;
+- Acrescentar melhorias a documentação;
+- Criar novas features
 
-All contributions are welcome!
+Todas contribuições são bem vindas!
 
 
 ## 📝 License
