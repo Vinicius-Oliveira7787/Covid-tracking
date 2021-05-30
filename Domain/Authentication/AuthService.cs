@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Domain.Authentication
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly string secureKey = "this is a very secure key";
 

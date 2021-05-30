@@ -3,8 +3,6 @@ using Domain.Authentication;
 using Domain.Countries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Controllers.CovidApi;
-
 namespace WebApi.Controllers.Auth
 {
     [ApiController]

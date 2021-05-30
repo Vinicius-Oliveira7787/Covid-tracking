@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Domain.Authentication;
+using FluentValidation.AspNetCore;
+using WebApi.Controllers.CovidApi;
 
 namespace WebApi
 {
@@ -30,10 +32,16 @@ namespace WebApi
             services.AddScoped<ICountriesRepository, CountriesRepository>();
             services.AddScoped<ICountriesService, CountriesService>();
             services.AddScoped<IConsumer, Consumer>();
-            services.AddScoped<AuthService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddDbContext<CovidContext>();
 
-            services.AddControllers();
+            services
+                .AddControllers()
+                .AddFluentValidation(fv => fv
+                    .RegisterValidatorsFromAssemblyContaining<RequestValidator>()
+                );
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
@@ -70,6 +78,8 @@ namespace WebApi
             app.UseCors("any");
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseRouting();
 

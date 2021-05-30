@@ -50,7 +50,7 @@ namespace WebApi.Controllers.CovidApi
             return Ok(data);
         }
 
-        [HttpDelete]
+        [HttpDelete("delete")]
         public IActionResult Delete(CountryNameRequest request)
         {
             var response = ValidateToken();
@@ -65,7 +65,7 @@ namespace WebApi.Controllers.CovidApi
             return NotFound(new { message = "Country Not Founded" });
         }
 
-        [HttpPut]
+        [HttpPut("update")]
         public IActionResult Update(CountryNameRequest request)
         {
             var response = ValidateToken();
@@ -80,7 +80,7 @@ namespace WebApi.Controllers.CovidApi
             return NotFound(new { message = "Country Not Founded"});
         }
 
-        [HttpPost]
+        [HttpPost("country")]
         public IActionResult Create(CountryNameRequest request)
         {
             var response = ValidateToken();
