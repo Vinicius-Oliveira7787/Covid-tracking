@@ -78,6 +78,7 @@ Tecnologias utilizadas na construção do projeto
 > Obs.: Recomendo usar docker para melhor praticidade do que o próprio banco de dados
 
 1. execute o comando 'docker-compose up' na raiz do projeto
+**Antes de executar as migrations verifique a instalação da cli de migrations, caso não estiver apenas execute o comando: dotnet tool install --global dotnet-ef**
 2. execute o comando 'dotnet ef migrations add nome da migration' dentro da pasta Infra
 **Verifique se foi criado o banco de dados chamado db. Se não crie manualmente**
 3. execute o comando 'dotnet run' dentro da pasta WebApi
