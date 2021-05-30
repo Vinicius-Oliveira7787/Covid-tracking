@@ -9,9 +9,9 @@ namespace WebApi.Controllers.Auth
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly AuthService _jwtService;
+        private readonly IAuthService _jwtService;
 
-        public UserController(AuthService authenticationService)
+        public UserController(IAuthService authenticationService)
         {
             _jwtService = authenticationService;
         }

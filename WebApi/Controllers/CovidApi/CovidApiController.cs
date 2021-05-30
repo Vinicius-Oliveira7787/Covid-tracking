@@ -10,9 +10,9 @@ namespace WebApi.Controllers.CovidApi
     public class CovidApiController : ControllerBase
     {
         private static ICountriesService _countriesService { get; set; }
-        private readonly AuthService _jwtService;
+        private readonly IAuthService _jwtService;
 
-        public CovidApiController(ICountriesService service, AuthService authenticationService)
+        public CovidApiController(ICountriesService service, IAuthService authenticationService)
         {
             _countriesService = service;
             _jwtService = authenticationService;
