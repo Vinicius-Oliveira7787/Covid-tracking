@@ -7,6 +7,6 @@ namespace Domain.ApiConnection.Consumers
     {
         Country GetByName(string countryName);
         
-        IList<Country> GetAllContries();
+        IList<Country> GetAll();
     }
 }

@@ -7,13 +7,13 @@ namespace Domain.Countries
     {
         CreatedCountryDTO Create(string countryName);
         
-        Country GetCountryByName(string countryName);
+        Country GetCountry(string countryName);
 
         bool Delete(string countryName);
 
-        bool Update(string countryName);
+        (string message, bool isValid) Update(string countryName);
         
-        Country GetCountryByID(Guid id);
+        Country GetCountry(Guid id);
 
         IList<Country> GetAll();
 

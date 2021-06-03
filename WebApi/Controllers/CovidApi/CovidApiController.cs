@@ -24,7 +24,7 @@ namespace WebApi.Controllers.CovidApi
             var response = ValidateToken();
             if (!response.isValid) return response.statusCode;
             
-            var data = _countriesService.GetCountryByName(request.CountryName);
+            var data = _countriesService.GetCountry(request.CountryName);
             if (data != null) return Ok(data);
 
             return NotFound(new { message = "Country Not Founded" });
@@ -62,7 +62,7 @@ namespace WebApi.Controllers.CovidApi
                 return Ok(new { message = "success" });
             }
 
-            return NotFound(new { message = "Country Not Founded" });
+            return BadRequest(new { message = "Country Not Founded" });
         }
 
         [HttpPut("update")]
@@ -72,12 +72,12 @@ namespace WebApi.Controllers.CovidApi
             if (!response.isValid) return response.statusCode;
 
             var wasUpdated = _countriesService.Update(request.CountryName);
-            if (wasUpdated)
+            if (wasUpdated.isValid)
             {
-                return Ok(new { message = "success"});
+                return Ok(new { message = wasUpdated.message});
             }
 
-            return NotFound(new { message = "Country Not Founded"});
+            return BadRequest(new { message = wasUpdated.message});
         }
 
         [HttpPost("country")]

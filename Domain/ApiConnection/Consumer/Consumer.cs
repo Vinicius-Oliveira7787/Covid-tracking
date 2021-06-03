@@ -35,6 +35,7 @@ namespace Domain.ApiConnection.Consumers
                 };
 
                 var response = HttpInstance.GetHttpClientInstance().SendAsync(request).Result;
+                //! return (response.StatusCode, true);
                 return (response, true);
             }
 
@@ -68,7 +69,7 @@ namespace Domain.ApiConnection.Consumers
             return new Country(countryName, activeCases, lastUpdate, newCases, newDeaths, totalCases, totalDeaths, totalRecovered);
         }
         
-        public IList<Country> GetAllContries()
+        public IList<Country> GetAll()
         {
             var countries = new List<Country>();
             

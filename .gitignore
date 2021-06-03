@@ -133,6 +133,7 @@ $RECYCLE.BIN/
 _NCrunch*
 
 .vscode
+.vs
 
 # docker volumes
 volumes/

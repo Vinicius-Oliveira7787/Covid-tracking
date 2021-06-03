@@ -8,13 +8,12 @@ namespace Domain.Common
     {
         void Add(T entity);
 
-        void Delete(string countryName);
+        void Delete(Guid id);
         
-        void Update(Country country);
+        void Update(T outdatedEntity, T updatedEntity);
         
-        IList<Country> GetAll();
+        IList<T> GetAll();
 
-        Country Get(Func<Country, bool> predicate);
-        // T Get(Func<T, bool> predicate);
+        T Get(Func<T, bool> predicate);
     }
 }

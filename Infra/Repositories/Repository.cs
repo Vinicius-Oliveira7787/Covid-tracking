@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Domain.Common;
 using Domain.Countries;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infra
 {
@@ -21,34 +23,27 @@ namespace Infra
             covidContext.SaveChanges();
         }
 
-        public void Update(Country countryUpdated)
+        public void Update(T outdatedEntity, T updatedEntity)
         {
-            var countryOutdated = Get(x => x.CountryName.ToLower() == countryUpdated.CountryName.ToLower());
-            if (countryOutdated != null)
-            {
-                countryUpdated.Id = countryOutdated.Id;
-                Delete(countryOutdated.CountryName);
-                covidContext.Add(countryUpdated);
-                covidContext.SaveChanges();
-            }
+            covidContext.Remove(outdatedEntity);
+            Add(updatedEntity);
         }
 
-        public void Delete(string countryName)
+        public void Delete(Guid id)
         {
-            var country = Get(x => x.CountryName.ToLower() == countryName.ToLower());
-            covidContext.Remove(country);
+            var entity = Get(x => x.Id == id);
+            covidContext.Remove(entity);
             covidContext.SaveChanges();
         }
 
-        public IList<Country> GetAll()
+        public IList<T> GetAll()
         {
-            return covidContext.Countries.ToList();
+            return covidContext.Set<T>().ToList();
         }
 
-        public Country Get(Func<Country, bool> predicate)
+        public T Get(Func<T, bool> predicate)
         {
-            // return covidContext.Set<T>().FirstOrDefault(predicate); //! Não está funcionando 😥
-            return covidContext.Countries.FirstOrDefault(predicate);
+            return covidContext.Set<T>().SingleOrDefault(predicate);
         }
     }
 }

@@ -37,16 +37,12 @@ namespace Domain.Countries
             return new CreatedCountryDTO(country.Id);
         }
 
-        public Country GetCountryByName(string countryName)
-        {
-            return _repository.Get(x => x.CountryName.ToLower() == countryName.ToLower());
-        }
-
         public bool Delete(string countryName)
         {
             try
             {
-                _repository.Delete(countryName);
+                var country = GetCountry(countryName);
+                _repository.Delete(country.Id);
                 return true;
             }
 
@@ -56,23 +52,26 @@ namespace Domain.Countries
             }
         }
 
-        public bool Update(string countryName)
+        public (string message, bool isValid) Update(string countryName)
         {
             try
             {
                 var countryUpdated = _consumer.GetByName(countryName);
-                if(countryUpdated == null || countryUpdated.CountryName != countryName) 
+                if(countryUpdated == null || countryUpdated.CountryName.ToLower() != countryName.ToLower()) 
                 {
-                    return false;
+                    return ("Country Not Founded", false);
                 }
+                
+                var countryOutdated = GetCountry(countryName);
+                countryUpdated.Id = countryOutdated.Id;
 
-                _repository.Update(countryUpdated);
-                return true;
+                _repository.Update(countryOutdated, countryUpdated);
+                return ("Success", true);
             }
 
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                return false;
+                return (ex.Message, false);
             }
         }
 
@@ -81,7 +80,12 @@ namespace Domain.Countries
             return _repository.GetAll();
         }
 
-        public Country GetCountryByID(Guid id)
+        public Country GetCountry(string countryName)
+        {
+            return _repository.Get(x => x.CountryName.ToLower() == countryName.ToLower());
+        }
+
+        public Country GetCountry(Guid id)
         {
             return _repository.Get(x => x.Id == id);
         }

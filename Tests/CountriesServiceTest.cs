@@ -65,7 +65,7 @@ namespace Tests.Countries
             repository.Setup(x => x.Get(It.IsAny<Func<Country, bool>>())).Returns(GenerateValidCountry("Brazil"));
             
             // Quando / Ação
-            var response = countriesService.GetCountryByName("Brazil");
+            var response = countriesService.GetCountry("Brazil");
 
             // Deve / Asserções
             Assert.NotNull(response);
@@ -79,7 +79,7 @@ namespace Tests.Countries
             repository.Setup(x => x.Get(It.IsAny<Func<Country, bool>>())).Returns(It.IsAny<Country>());
             
             // Quando / Ação
-            var response = countriesService.GetCountryByName("Brazil");
+            var response = countriesService.GetCountry("Brazil");
 
             // Deve / Asserções
             Assert.Null(response);
@@ -90,28 +90,28 @@ namespace Tests.Countries
         public void Delete_method_is_not_valid()
         {
             // Dado / Setup
-            repository.Setup(x => x.Delete(It.IsAny<string>())).Throws<Exception>();
+            repository.Setup(x => x.Delete(It.IsAny<Guid>())).Throws<Exception>();
             
             // Quando / Ação
             var response = countriesService.Delete("Brazil");
 
             // Deve / Asserções
             Assert.False(response);
-            repository.Verify(x => x.Delete(It.IsAny<string>()), Times.Once());
+            repository.Verify(x => x.Delete(It.IsAny<Guid>()), Times.Once());
         }
 
         [Fact]
         public void Delete_method_is_valid()
         {
             // Dado / Setup
-            repository.Setup(x => x.Delete(It.IsAny<string>()));
+            repository.Setup(x => x.Delete(It.IsAny<Guid>()));
             
             // Quando / Ação
             var response = countriesService.Delete("Brazil");
 
             // Deve / Asserções
             Assert.True(response);
-            repository.Verify(x => x.Delete(It.IsAny<string>()), Times.Once());
+            repository.Verify(x => x.Delete(It.IsAny<Guid>()), Times.Once());
         }
 
         [Fact]
@@ -181,7 +181,6 @@ namespace Tests.Countries
             Assert.Null(response);
         }
 
-        // TODO: Terminar de fazer as listas para teste
         public static TheoryData<(List<Country>, List<string>)> PercentageDiference()
         {
             return new TheoryData<(List<Country>, List<string>)>
