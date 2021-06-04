@@ -29,9 +29,8 @@ namespace Infra
             Add(updatedEntity);
         }
 
-        public void Delete(Guid id)
+        public void Delete(T entity)
         {
-            var entity = Get(x => x.Id == id);
             covidContext.Remove(entity);
             covidContext.SaveChanges();
         }

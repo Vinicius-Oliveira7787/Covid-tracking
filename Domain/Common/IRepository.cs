@@ -8,7 +8,7 @@ namespace Domain.Common
     {
         void Add(T entity);
 
-        void Delete(Guid id);
+        void Delete(T entity);
         
         void Update(T outdatedEntity, T updatedEntity);
         

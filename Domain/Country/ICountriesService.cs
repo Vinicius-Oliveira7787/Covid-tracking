@@ -5,11 +5,11 @@ namespace Domain.Countries
 {
     public interface ICountriesService
     {
-        CreatedCountryDTO Create(string countryName);
+        (string message, bool isValid) Create(string countryName);
         
         Country GetCountry(string countryName);
 
-        bool Delete(string countryName);
+        void Delete(string countryName);
 
         (string message, bool isValid) Update(string countryName);
         

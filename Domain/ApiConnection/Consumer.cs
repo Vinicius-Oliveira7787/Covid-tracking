@@ -9,53 +9,42 @@ namespace Domain.ApiConnection.Consumers
 {
     public class Consumer : IConsumer
     {
-        public static string BaseUrl 
-        {
-            get
-            {
-                return "https://covid-19-tracking.p.rapidapi.com/v1";
-            }
-        }
+        public readonly string BaseUrl = "https://covid-19-tracking.p.rapidapi.com/v1";
 
-        private (HttpResponseMessage message, bool isValid) GetResponseFromApi(string countryName = null)
+        private HttpResponseMessage GetResponseFromApi(string countryName = null)
         {
-            try
+            var request = new HttpRequestMessage
             {
-                var request = new HttpRequestMessage
+                Method = HttpMethod.Get,
+                RequestUri = String.IsNullOrEmpty(countryName) 
+                    ? new Uri(BaseUrl)
+                    : new Uri(BaseUrl + $"/{countryName}"),
+                Headers =
                 {
-                    Method = HttpMethod.Get,
-                    RequestUri = String.IsNullOrEmpty(countryName) 
-                        ? new Uri(BaseUrl)
-                        : new Uri(BaseUrl + $"/{countryName}"),
-                    Headers =
-                    {
-                        { "x-rapidapi-key", "f39163a60cmsh5dbbe815ab8b2bbp169ce1jsn363ad8afacf9" },
-                        { "x-rapidapi-host", "covid-19-tracking.p.rapidapi.com" },
-                    },
-                };
+                    { "x-rapidapi-key", "f39163a60cmsh5dbbe815ab8b2bbp169ce1jsn363ad8afacf9" },
+                    { "x-rapidapi-host", "covid-19-tracking.p.rapidapi.com" },
+                },
+            };
 
-                var response = HttpInstance.GetHttpClientInstance().SendAsync(request).Result;
-                //! return (response.StatusCode, true);
-                return (response, true);
-            }
-
-            catch (System.Exception)
-            {
-                return (null, false);
-            }
+            return HttpInstance.GetHttpClientInstance().SendAsync(request).Result;
         }
 
         public Country GetByName(string countryName)
         {
             var response = GetResponseFromApi(countryName);
-            if (!response.isValid) return null;
 
-            var covidData = JObject.Parse(response.message.Content.ReadAsStringAsync().Result);
+            var covidData = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             
-            return JTokenToCountry(covidData);
+            var country = ToCountry(covidData);
+            if (country.CountryName != countryName)
+            {
+                throw new Exception("Country doesn't exists.");
+            }
+
+            return country;
         }
 
-        private Country JTokenToCountry(JToken data)
+        private Country ToCountry(JToken data)
         {
             var countryName = data["Country_text"].ToString();
             var activeCases = data["Active Cases_text"].ToObject<double>();
@@ -74,17 +63,17 @@ namespace Domain.ApiConnection.Consumers
             var countries = new List<Country>();
             
             var response = GetResponseFromApi();
-            var covidData = JArray.Parse(response.message.Content.ReadAsStringAsync().Result);
+            var covidData = JArray.Parse(response.Content.ReadAsStringAsync().Result);
 
             foreach (var currentCountry in covidData)
             {
                 try
                 {
-                    var country = JTokenToCountry(currentCountry);
+                    var country = ToCountry(currentCountry);
                     countries.Add(country);
                 }
 
-                catch (System.Exception)
+                catch (Exception)
                 {
                     continue;
                 }

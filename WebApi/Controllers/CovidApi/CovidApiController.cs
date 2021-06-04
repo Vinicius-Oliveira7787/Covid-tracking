@@ -24,10 +24,18 @@ namespace WebApi.Controllers.CovidApi
             var response = ValidateToken();
             if (!response.isValid) return response.statusCode;
             
-            var data = _countriesService.GetCountry(request.CountryName);
-            if (data != null) return Ok(data);
+            try
+            {
+                var data = _countriesService.GetCountry(request.CountryName);
+                if (data == null) throw new Exception("Country Not Founded");
 
-            return NotFound(new { message = "Country Not Founded" });
+                return Ok(data);
+            }
+            
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet("countries")]
@@ -36,8 +44,16 @@ namespace WebApi.Controllers.CovidApi
             var response = ValidateToken();
             if (!response.isValid) return response.statusCode;
 
-            var data = _countriesService.GetAll();
-            return Ok(data);
+            try
+            {
+                var data = _countriesService.GetAll();
+                return Ok(data);
+            }
+
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message); 
+            }
         }
 
         [HttpGet("countries/percentage")]
@@ -45,9 +61,16 @@ namespace WebApi.Controllers.CovidApi
         {
             var response = ValidateToken();
             if (!response.isValid) return response.statusCode;
-            
-            var data = _countriesService.PercentageDiference();
-            return Ok(data);
+
+            try
+            {
+                return Ok(_countriesService.PercentageDiference());
+            }
+
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete("delete")]
@@ -55,14 +78,17 @@ namespace WebApi.Controllers.CovidApi
         {
             var response = ValidateToken();
             if (!response.isValid) return response.statusCode;
-
-            var wasDeleted = _countriesService.Delete(request.CountryName);
-            if (wasDeleted)
+            
+            try
             {
+                _countriesService.Delete(request.CountryName);
                 return Ok(new { message = "success" });
             }
-
-            return BadRequest(new { message = "Country Not Founded" });
+            
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpPut("update")]
@@ -71,13 +97,14 @@ namespace WebApi.Controllers.CovidApi
             var response = ValidateToken();
             if (!response.isValid) return response.statusCode;
 
-            var wasUpdated = _countriesService.Update(request.CountryName);
-            if (wasUpdated.isValid)
+            var updateVerification = _countriesService.Update(request.CountryName);
+            
+            if (updateVerification.isValid)
             {
-                return Ok(new { message = wasUpdated.message});
+                return Ok(new { message = updateVerification.message});
             }
 
-            return BadRequest(new { message = wasUpdated.message});
+            return BadRequest(new { message = updateVerification.message});
         }
 
         [HttpPost("country")]
@@ -87,12 +114,12 @@ namespace WebApi.Controllers.CovidApi
             if (!response.isValid) return response.statusCode;
 
             var data = _countriesService.Create(request.CountryName);
-            if (data.IsValid)
+            if (data.isValid)
             {
-                return Created("", new { message = "success"});
+                return Created("", new { message = data.message});
             }
 
-            return BadRequest(new {errors = data.Errors});
+            return BadRequest(new {errors = data.message});
         }
 
         private (IActionResult statusCode, bool isValid) ValidateToken()

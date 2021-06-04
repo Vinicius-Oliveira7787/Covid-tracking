@@ -16,40 +16,26 @@ namespace Domain.Countries
             _consumer = consumer;
         }
 
-        public CreatedCountryDTO Create(string countryName)
+        public (string message, bool isValid) Create(string countryName)
         {
             var country = _consumer.GetByName(countryName);
-            if(country == null || country.CountryName != countryName) 
-            {
-                return new CreatedCountryDTO(new List<string>{"Country doesn't exists."});
-            }
 
             try
             {
                 _repository.Add(country);
             }
             
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
-                return new CreatedCountryDTO(new List<string>{"No repeated contries."});
+                return (ex.Message, false);
             }
 
-            return new CreatedCountryDTO(country.Id);
+            return ("Success", true);
         }
 
-        public bool Delete(string countryName)
+        public void Delete(string countryName)
         {
-            try
-            {
-                var country = GetCountry(countryName);
-                _repository.Delete(country.Id);
-                return true;
-            }
-
-            catch (System.Exception)
-            {
-                return false;
-            }
+            _repository.Delete(GetCountry(countryName));
         }
 
         public (string message, bool isValid) Update(string countryName)
@@ -57,10 +43,6 @@ namespace Domain.Countries
             try
             {
                 var countryUpdated = _consumer.GetByName(countryName);
-                if(countryUpdated == null || countryUpdated.CountryName.ToLower() != countryName.ToLower()) 
-                {
-                    return ("Country Not Founded", false);
-                }
                 
                 var countryOutdated = GetCountry(countryName);
                 countryUpdated.Id = countryOutdated.Id;
