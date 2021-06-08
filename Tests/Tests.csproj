@@ -19,8 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Infra\Infra.csproj" />
+    <ProjectReference Include="..\src\CovidTracking.Services\CovidTracking.Services.csproj" />
+    <ProjectReference Include="..\src\CovidTracking.API.Client\CovidTracking.API.Client.csproj" />
+    <ProjectReference Include="..\src\CovidTracking.Data\CovidTracking.Data.csproj" />
   </ItemGroup>
 
 </Project>

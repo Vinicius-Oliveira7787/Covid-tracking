@@ -1,5 +1,6 @@
-using Domain.ApiConnection.Consumers;
-using Domain.Countries;
+using CovidTracking.API.Client.ApiConnection;
+using CovidTracking.Data.Repositories;
+using CovidTracking.Services.Countries;
 using Moq;
 
 namespace Tests.Mocks

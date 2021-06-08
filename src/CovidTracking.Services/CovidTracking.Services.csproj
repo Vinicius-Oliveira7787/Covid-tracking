@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CovidTracking.API.Models\CovidTracking.API.Models.csproj" />
+    <ProjectReference Include="..\CovidTracking.Data\CovidTracking.Data.csproj" />
+    <ProjectReference Include="..\CovidTracking.API.Client\CovidTracking.API.Client.csproj" />
+  </ItemGroup>
+
+</Project>
