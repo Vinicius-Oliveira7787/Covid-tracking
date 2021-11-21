@@ -6,7 +6,7 @@ namespace CovidTracking.Services.Countries
 {
     public interface ICountriesService
     {
-        void Create(string countryName);
+        void CreateAsync(string countryName);
         
         Country GetCountry(string countryName);
 
