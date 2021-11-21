@@ -1,6 +1,6 @@
-﻿using System.Reflection;
-using CovidTracking.API.Models.Entities;
+﻿using CovidTracking.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace CovidTracking.Data
 {

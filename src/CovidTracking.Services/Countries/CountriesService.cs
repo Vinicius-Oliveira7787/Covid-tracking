@@ -1,4 +1,6 @@
+using AutoMapper;
 using CovidTracking.API.Client.Implementation.CovidTracking;
+using CovidTracking.Data.Models;
 using CovidTracking.Data.Repositories;
 using System;
 using System.Collections.Generic;
@@ -9,19 +11,26 @@ namespace CovidTracking.Services.Countries
 {
     public class CountriesService : ICountriesService
     {
-        private static ICountriesRepository _repository { get; set; }
-        private static ICovidTrackingAPIClient _CovidTrackingAPICLient { get; set; }
+        private readonly ICountriesRepository _repository;
+        private readonly ICovidTrackingAPIClient _CovidTrackingAPICLient;
+        private readonly IMapper _mapper;
 
-        public CountriesService(ICountriesRepository repository, ICovidTrackingAPIClient covidTrackingAPICLient)
+        public CountriesService(
+            ICountriesRepository repository,
+            ICovidTrackingAPIClient covidTrackingAPICLient,
+            IMapper mapper
+        )
         {
-            _repository = repository;
-            _CovidTrackingAPICLient = covidTrackingAPICLient;
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _CovidTrackingAPICLient = covidTrackingAPICLient ?? throw new ArgumentNullException(nameof(covidTrackingAPICLient));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task SaveCountryByNameAsync(string countryName)
         {
-            var entity = await _CovidTrackingAPICLient.GetCountryDataByNameAsync(countryName);
-            _repository.Add();
+            var countryData = await _CovidTrackingAPICLient.GetCountryDataByNameAsync(countryName);
+            var country = _mapper.Map<Country>(countryData);
+            _repository.Add(country);
         }
 
         public void Delete(string countryName)
@@ -29,9 +38,10 @@ namespace CovidTracking.Services.Countries
             _repository.Delete(GetCountry(countryName));
         }
 
-        public void Update(string countryName)
+        public async Task UpdateAsync(string countryName)
         {
-            var countryUpdated = _consumer.GetByName(countryName);
+            var countryData = await _CovidTrackingAPICLient.GetCountryDataByNameAsync(countryName);
+            var countryUpdated = _mapper.Map<Country>(countryData);
 
             var countryOutdated = GetCountry(countryName);
             countryUpdated.Id = countryOutdated.Id;
@@ -49,7 +59,7 @@ namespace CovidTracking.Services.Countries
             return _repository.Get(x => x.CountryName.ToLower() == countryName.ToLower());
         }
 
-        public Country GetCountry(Guid id)
+        public Country GetCountry(int id)
         {
             return _repository.Get(x => x.Id == id);
         }

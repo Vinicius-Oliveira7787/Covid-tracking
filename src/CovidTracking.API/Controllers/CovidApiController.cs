@@ -1,7 +1,7 @@
-﻿using System;
-using CovidTracking.Services.Authentication;
-using CovidTracking.Services.Countries;
+﻿using CovidTracking.Services.Countries;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace CovidTracking.Controllers.CovidApi
 {
@@ -9,136 +9,55 @@ namespace CovidTracking.Controllers.CovidApi
     [Route("[controller]")]
     public class CovidApiController : ControllerBase
     {
-        private static ICountriesService _countriesService { get; set; }
-        private readonly IAuthService _jwtService;
+        private readonly ICountriesService _countriesService;
 
-        public CovidApiController(ICountriesService service, IAuthService authenticationService)
+        public CovidApiController(ICountriesService service)
         {
-            _countriesService = service;
-            _jwtService = authenticationService;
+            _countriesService = service ?? throw new ArgumentNullException(nameof(service));
         }
 
         [HttpGet("country")]
-        public IActionResult GetSingleCountryByName(CountryNameRequest request)
+        public IActionResult GetSingleCountryByName(string countryName)
         {
-            try
-            {
-                ValidateToken();
+            var data = _countriesService.GetCountry(countryName) 
+                ?? throw new Exception("Country Not Founded");
 
-                var data = _countriesService.GetCountry(request.CountryName);
-                if (data == null) throw new Exception("Country Not Founded");
-
-                return Ok(data);
-            }
-            
-            catch (System.Exception ex)
-            {
-                return BadRequest(new {Error = HandleException(ex)});
-            }
+            return Ok(data);
         }
 
         [HttpGet("countries")]
         public IActionResult GetAllCountries()
         {
-            try
-            {
-                ValidateToken();
-                return Ok(_countriesService.GetAll());
-            }
-
-            catch (System.Exception ex)
-            {
-                return BadRequest(new {Error = HandleException(ex)});
-            }
+            return Ok(_countriesService.GetAll());
         }
 
         [HttpGet("countries/percentage")]
         public IActionResult GetPercentageDiference()
         {
-            try
-            {
-                ValidateToken();
-                return Ok(_countriesService.PercentageDiference());
-            }
-
-            catch (System.Exception ex)
-            {
-                return BadRequest(new {Error = HandleException(ex)});
-            }
+            return Ok(_countriesService.PercentageDiference());
         }
 
         [HttpDelete("delete")]
-        public IActionResult Delete(CountryNameRequest request)
+        public IActionResult Delete(string countryName)
         {
-            try
-            {
-                ValidateToken();
-                
-                _countriesService.Delete(request.CountryName);
-                return Ok(new { message = "success" });
-            }
-
-            catch (Exception ex)
-            {
-                return BadRequest(new {Error = HandleException(ex)});
-            }
+            _countriesService.Delete(countryName);
+            return Ok(new { message = "success" });
         }
 
         [HttpPut("update")]
-        public IActionResult Update(CountryNameRequest request)
+        public async Task<IActionResult> UpdateAsync(string countryName)
         {
-            try
-            {
-                ValidateToken();
+            await _countriesService.UpdateAsync(countryName);
 
-                _countriesService.Update(request.CountryName);
-                
-                return Ok(new { message = "Success"});
-            }
-
-            catch (System.Exception ex)
-            {
-                return BadRequest(new {Error = HandleException(ex)});
-            }
+            return Ok(new { message = "Success" });
         }
 
         [HttpPost("country")]
-        public IActionResult Create(CountryNameRequest request)
+        public async Task<IActionResult> CreateAsync(string countryName)
         {
-            try
-            {
-                ValidateToken();
-    
-                _countriesService.Create(request.CountryName);
+            await _countriesService.SaveCountryByNameAsync(countryName);
 
-                return Created("", new { message = "Success"});
-            }
-
-            catch (Exception ex)
-            {
-                return BadRequest(new {Error = HandleException(ex)});
-            }
-        }
-
-        private string HandleException(Exception ex)
-        {
-            // TODO: Verificar se o message == inner exception
-            return ex.Message.Contains("See the inner exception for details")
-                ? ex.InnerException.Message
-                : ex.Message;
-        }
-        
-        private void ValidateToken()
-        {
-            var jwt = Request.Cookies["jwt"];
-            var token = _jwtService.Verify(jwt);
-
-            var userId = token.Issuer;
-
-            if (userId != "1ccc377c-6090-42d7-a74f-8f3cd49357a2")
-            {
-                throw new Exception("Unauthorized");
-            }
+            return Created("", new { message = "Success" });
         }
     }
 }

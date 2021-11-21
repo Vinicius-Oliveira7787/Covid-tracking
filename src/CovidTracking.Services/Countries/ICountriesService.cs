@@ -1,20 +1,20 @@
-using System;
+using CovidTracking.Data.Models;
 using System.Collections.Generic;
-using CovidTracking.API.Models.Entities;
+using System.Threading.Tasks;
 
 namespace CovidTracking.Services.Countries
 {
     public interface ICountriesService
     {
-        void CreateAsync(string countryName);
-        
+        Task SaveCountryByNameAsync(string countryName);
+
         Country GetCountry(string countryName);
 
         void Delete(string countryName);
 
-        void Update(string countryName);
-        
-        Country GetCountry(Guid id);
+        Task UpdateAsync(string countryName);
+
+        Country GetCountry(int id);
 
         IList<Country> GetAll();
 

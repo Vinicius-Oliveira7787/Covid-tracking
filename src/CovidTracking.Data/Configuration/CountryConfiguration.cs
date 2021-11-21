@@ -1,4 +1,4 @@
-using CovidTracking.API.Models.Entities;
+using CovidTracking.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,6 +9,8 @@ namespace CovidTracking.Data.Configuration
         public void Configure(EntityTypeBuilder<Country> builder)
         {
             builder.HasKey(country => country.Id);
+            builder.Property(country => country.Id).ValueGeneratedOnAdd();
+
             builder.Property(country => country.ActiveCases).IsRequired();
             builder.Property(country => country.CountryName).IsRequired();
             builder.HasIndex(country => country.CountryName).IsUnique();

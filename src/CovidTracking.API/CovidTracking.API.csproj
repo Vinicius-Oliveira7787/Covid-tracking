@@ -6,11 +6,13 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CovidTracking.API.Client\CovidTracking.API.Client.csproj" />
+    <ProjectReference Include="..\CovidTracking.Data.Models\CovidTracking.Data.Models.csproj" />
+    <ProjectReference Include="..\CovidTracking.Services\CovidTracking.Services.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
-using CovidTracking.API.Models.Entities;
+using CovidTracking.Data.Models;
 
 namespace CovidTracking.Data.Repositories
 {
-    public interface ICountriesRepository : IRepository<Country> {}
+    public interface ICountriesRepository : IRepository<Country> { }
 }

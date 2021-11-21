@@ -4,6 +4,7 @@ namespace CovidTracking.Data.Models
 {
     public class Country
     {
+        public int Id { get; set; }
         public string CountryName { get; set; }
         public double ActiveCases { get; set; }
         public DateTime LastUpdate { get; set; }

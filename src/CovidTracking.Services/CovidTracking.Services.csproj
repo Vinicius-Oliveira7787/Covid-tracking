@@ -5,11 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CovidTracking.API.Models\CovidTracking.API.Models.csproj" />
+    <ProjectReference Include="..\CovidTracking.Data.Models\CovidTracking.Data.Models.csproj" />
     <ProjectReference Include="..\CovidTracking.Data\CovidTracking.Data.csproj" />
     <ProjectReference Include="..\CovidTracking.API.Client\CovidTracking.API.Client.csproj" />
   </ItemGroup>

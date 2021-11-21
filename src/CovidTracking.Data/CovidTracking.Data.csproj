@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CovidTracking.API.Models\CovidTracking.API.Models.csproj" />
+    <ProjectReference Include="..\CovidTracking.Data.Models\CovidTracking.Data.Models.csproj" />
   </ItemGroup>
 
 </Project>
