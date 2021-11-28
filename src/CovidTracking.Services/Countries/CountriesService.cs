@@ -1,7 +1,7 @@
 using AutoMapper;
 using CovidTracking.API.Client.Implementation.CovidTracking;
 using CovidTracking.Data.Models;
-using CovidTracking.Data.Repositories;
+using EntityFrameworkCore.UnitOfWork.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,57 +11,69 @@ namespace CovidTracking.Services.Countries
 {
     public class CountriesService : ICountriesService
     {
-        private readonly ICountriesRepository _repository;
-        private readonly ICovidTrackingAPIClient _CovidTrackingAPICLient;
+        private readonly ICovidTrackingAPIClient _covidTrackingAPICLient;
+        private readonly IRepositoryFactory _repositoryFactory;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
         public CountriesService(
-            ICountriesRepository repository,
             ICovidTrackingAPIClient covidTrackingAPICLient,
+            IRepositoryFactory repositoryFactory,
+            IUnitOfWork unitOfWork,
             IMapper mapper
         )
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-            _CovidTrackingAPICLient = covidTrackingAPICLient ?? throw new ArgumentNullException(nameof(covidTrackingAPICLient));
+            _covidTrackingAPICLient = covidTrackingAPICLient ?? throw new ArgumentNullException(nameof(covidTrackingAPICLient));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _repositoryFactory = repositoryFactory;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task SaveCountryByNameAsync(string countryName)
         {
-            var countryData = await _CovidTrackingAPICLient.GetCountryDataByNameAsync(countryName);
+            var countryData = await _covidTrackingAPICLient.GetCountryDataByNameAsync(countryName);
             var country = _mapper.Map<Country>(countryData);
-            _repository.Add(country);
+            
+            var repository = _unitOfWork.Repository<Country>();
+            
+            repository.Add(country);
         }
 
         public void Delete(string countryName)
         {
-            _repository.Delete(GetCountry(countryName));
+            var repository = _unitOfWork.Repository<Country>();
+
+            repository.Remove(GetCountry(countryName));
         }
 
         public async Task UpdateAsync(string countryName)
         {
-            var countryData = await _CovidTrackingAPICLient.GetCountryDataByNameAsync(countryName);
+            var countryData = await _covidTrackingAPICLient.GetCountryDataByNameAsync(countryName);
             var countryUpdated = _mapper.Map<Country>(countryData);
 
             var countryOutdated = GetCountry(countryName);
             countryUpdated.Id = countryOutdated.Id;
 
-            _repository.Update(countryOutdated, countryUpdated);
+            var repository = _unitOfWork.Repository<Country>();
+
+            repository.Update(countryUpdated);
         }
 
-        public IList<Country> GetAll()
+        public IEnumerable<Country> GetAll()
         {
-            return _repository.GetAll();
+            var repository = _repositoryFactory.Repository<Country>();
+            var query = repository.MultipleResultQuery();
+
+            return repository.Search(query);
         }
 
         public Country GetCountry(string countryName)
         {
-            return _repository.Get(x => x.CountryName.ToLower() == countryName.ToLower());
-        }
+            var repository = _repositoryFactory.Repository<Country>();
+            var query = repository.SingleResultQuery()
+                .AndFilter(x => x.CountryName.ToLower() == countryName.ToLower());
 
-        public Country GetCountry(int id)
-        {
-            return _repository.Get(x => x.Id == id);
+            return repository.FirstOrDefault(query);
         }
 
         public IList<string> PercentageDiference()
@@ -76,7 +88,7 @@ namespace CovidTracking.Services.Countries
                 var inicialValue = contriesOrdered[i].ActiveCases;
 
                 var percentage = (finalValue - inicialValue) / inicialValue * 100;
-                percentageDiference.Add($"Percentual da Diferença em casos ativos entre: {contriesOrdered[i - 1].CountryName} e {contriesOrdered[i].CountryName} = {percentage.ToString("N2")}%");
+                percentageDiference.Add($"Percentual da Diferença em casos ativos entre: {contriesOrdered[i - 1].CountryName} e {contriesOrdered[i].CountryName} = {percentage:N2}%");
             }
 
             return percentageDiference;

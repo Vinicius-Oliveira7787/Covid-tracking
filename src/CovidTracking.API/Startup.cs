@@ -22,6 +22,8 @@ namespace CovidTracking.API
         {
             services.AddAPIsClient(Configuration);
 
+            services.AddModulesConfiguration(Configuration);
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

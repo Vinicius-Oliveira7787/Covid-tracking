@@ -14,9 +14,7 @@ namespace CovidTracking.Services.Countries
 
         Task UpdateAsync(string countryName);
 
-        Country GetCountry(int id);
-
-        IList<Country> GetAll();
+        IEnumerable<Country> GetAll();
 
         IList<string> PercentageDiference();
     }
