@@ -25,8 +25,8 @@ namespace CovidTracking.Services.Countries
         {
             _covidTrackingAPICLient = covidTrackingAPICLient ?? throw new ArgumentNullException(nameof(covidTrackingAPICLient));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _repositoryFactory = repositoryFactory;
-            _unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _repositoryFactory = repositoryFactory ?? _unitOfWork;
         }
 
         public async Task SaveCountryByNameAsync(string countryName)
@@ -73,7 +73,7 @@ namespace CovidTracking.Services.Countries
             var query = repository.SingleResultQuery()
                 .AndFilter(x => x.CountryName.ToLower() == countryName.ToLower());
 
-            return repository.FirstOrDefault(query);
+            return repository.SingleOrDefault(query);
         }
 
         public IList<string> PercentageDiference()
